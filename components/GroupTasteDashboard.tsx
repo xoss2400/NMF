@@ -1,83 +1,83 @@
 'use client'
 
-import React from 'react'
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
+import { Badge } from '../components/ui/badge'
+import { Progress } from '../components/ui/progress'
+import { ScrollArea } from '../components/ui/scroll-area'
 import type { GroupProfile } from '../lib/groupProfile'
 
-type Props = {
-  profile: GroupProfile
+function MoodBar({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-sm text-gray-300">
+        <span>{label}</span>
+        <span>{Math.round(value * 100)}%</span>
+      </div>
+      <Progress value={Math.min(value * 100, 100)} className="h-2 bg-gray-700" />
+    </div>
+  )
 }
 
-export default function GroupTasteDashboard({ profile }: Props) {
+export default function GroupTasteDashboard({ profile, groupName = 'Group' }: { profile: GroupProfile, groupName?: string }) {
   const mood = profile.moodCluster
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 space-y-12">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-center">🎧 Group Taste Summary</h1>
-        <p className="text-center text-gray-600">What your group is vibing with right now</p>
-      </div>
+    <ScrollArea className="w-full h-screen p-6 bg-gradient-to-b from-[#1f1f1f] to-[#0f0f0f] text-white font-sans">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <h1 className="text-4xl font-bold tracking-tight text-center">
+          {groupName}&apos;s Taste
+        </h1>
 
-      {/* Genres */}
-      <section className="bg-white p-6 rounded-xl shadow space-y-4">
-        <h2 className="text-xl font-semibold">Dominant Genres</h2>
-        <div className="flex flex-wrap gap-2">
-          {profile.dominantGenres.map((genre) => (
-            <span key={genre} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-              {genre}
-            </span>
-          ))}
-        </div>
-      </section>
+        {/* Dominant Genres */}
+        <Card className="bg-[#2a2a2a] border-none">
+          <CardHeader>
+            <CardTitle className="text-xl">Dominant Genres</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {profile.dominantGenres.map((genre) => (
+              <Badge key={genre} className="bg-teal-600 text-white">
+                {genre}
+              </Badge>
+            ))}
+          </CardContent>
+        </Card>
 
-      {/* Mood Cluster */}
-      <section className="bg-white p-6 rounded-xl shadow space-y-4">
-        <h2 className="text-xl font-semibold">Group Mood Cluster</h2>
-        <div className="space-y-3">
-          {[
-            { label: 'Danceability', value: mood.avgDanceability },
-            { label: 'Energy', value: mood.avgEnergy },
-            { label: 'Valence (Positivity)', value: mood.avgValence },
-            { label: 'Tempo', value: mood.avgTempo / 200 }, // Normalize tempo a bit
-          ].map(({ label, value }) => (
-            <div key={label}>
-              <div className="flex justify-between text-sm font-medium">
-                <span>{label}</span>
-                <span>{(value * 100).toFixed(0)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 h-2 rounded">
-                <div
-                  className="h-2 bg-gradient-to-r from-green-400 to-blue-500 rounded"
-                  style={{ width: `${value * 100}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* Mood Cluster */}
+        <Card className="bg-[#2a2a2a] border-none">
+          <CardHeader>
+            <CardTitle className="text-xl">Group Mood</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <MoodBar label="Danceability" value={mood.avgDanceability} />
+            <MoodBar label="Energy" value={mood.avgEnergy} />
+            <MoodBar label="Valence" value={mood.avgValence} />
+            <MoodBar label="Tempo" value={mood.avgTempo / 200} />
+          </CardContent>
+        </Card>
 
-      {/* Top Artists */}
-      <section className="bg-white p-6 rounded-xl shadow space-y-4">
-        <h2 className="text-xl font-semibold">Top Artists by Affinity</h2>
-        <div className="space-y-4">
-          {profile.topArtistsByAffinity.map((artist) => (
-            <div
-              key={artist.id}
-              className="p-4 border border-gray-200 rounded-lg hover:shadow transition"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium">{artist.name}</h3>
-                  <p className="text-sm text-gray-500">{artist.reason}</p>
+        {/* Top Artists by Affinity */}
+        <Card className="bg-[#2a2a2a] border-none">
+          <CardHeader>
+            <CardTitle className="text-xl">Shared Artists</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {profile.topArtistsByAffinity.map((artist) => (
+              <div
+                key={artist.id}
+                className="p-4 border border-[#3a3a3a] rounded-lg hover:bg-[#3a3a3a] transition"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-medium text-lg">{artist.name}</div>
+                  <div className="text-sm text-teal-500">
+                    Affinity Score: {artist.affinityScore}
+                  </div>
                 </div>
-                <span className="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded">
-                  {artist.affinityScore.toFixed(2)}
-                </span>
+                <p className="text-sm text-gray-300 mt-1">{artist.reason}</p>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </ScrollArea>
   )
 }
