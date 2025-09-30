@@ -1,5 +1,31 @@
 import querystring from "querystring";
 
+
+// UserTaste type for group profile
+export type UserTaste = {
+  userId: string;
+  topArtists: FullArtistProfile[];
+};
+
+// Fetch a user's top artists and build a UserTaste object
+export async function fetchUserTaste(accessToken: string, userId: string): Promise<UserTaste> {
+  // 1. Fetch user's top artists
+  const topArtistsRes = await fetch('https://api.spotify.com/v1/me/top/artists?limit=10', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  const topArtistsData = await topArtistsRes.json();
+  const topArtistIds = (topArtistsData.items || []).map((artist: any) => artist.id);
+  if (!topArtistIds.length) {
+    return { userId, topArtists: [] };
+  }
+  // 2. Fetch full artist profiles in batch
+  const artistProfiles = await fetchFullArtistProfiles(topArtistIds, accessToken);
+  return {
+    userId,
+    topArtists: artistProfiles,
+  };
+}
+
 export const getAccessToken = async (refreshToken: string) => {
   const response = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",

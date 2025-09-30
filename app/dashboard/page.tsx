@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Recommendations from '../../components/Recommendations'
-import GroupTasteDemo from '../../components/GroupTasteDemo'
+import GroupProfileView from '../../components/GroupProfileView'
 import Link from 'next/link'
 import { generateGroupTaste } from '../../lib/groupTaste'
 
@@ -81,7 +81,21 @@ export default function Dashboard() {
             ))}
           </ul>
           <Recommendations userTracks={tracks} />
-          <GroupTasteDemo />
+          {/* TODO: Replace this with real groupProfile from buildGroupProfile(users) */}
+          <GroupProfileView profile={{
+            dominantGenres: ["indie pop", "hip hop", "folk", "alt r&b"],
+            moodCluster: {
+              avgDanceability: 0.65,
+              avgEnergy: 0.7,
+              avgValence: 0.5,
+              avgTempo: 110,
+            },
+            topArtistsByAffinity: [
+              { id: "1", name: "Kendrick Lamar", affinityScore: 2.5, reason: "Liked by john, Related to SZA" },
+              { id: "2", name: "Phoebe Bridgers", affinityScore: 2, reason: "Liked by john, Also liked by sarah" },
+              { id: "3", name: "Frank Ocean", affinityScore: 1.5, reason: "Liked by john, Related to Tyler, The Creator" },
+            ],
+          }} />
         </>
       )}
     </div>
