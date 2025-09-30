@@ -8,11 +8,11 @@ import { useEffect, useState } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Recommendations from '../../components/Recommendations'
 import GroupProfileView from '../../components/GroupProfileView'
-import { useEffect, useState } from 'react';
 import { fetchUserTaste } from '../../lib/spotify';
 import { buildGroupProfile } from '../../lib/groupProfile';
 import Link from 'next/link'
 import { generateGroupTaste } from '../../lib/groupTaste'
+import GroupTasteLive from '../../components/GroupTasteLive'
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
