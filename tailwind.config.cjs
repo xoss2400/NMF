@@ -1,8 +1,20 @@
 module.exports = {
   content: [
-    './app/**/*.{ts,tsx}',        // App router files
-    './pages/**/*.{ts,tsx}',      // Optional, if you also have Pages
-    './components/**/*.{ts,tsx}', // All components
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx}',
+    './lib/**/*.{js,ts,jsx,tsx}', // ← if using classnames inside utils
+  ],
+  safelist: [
+    'text-white',
+    'text-black',
+    'bg-red-500',
+    'bg-blue-500',
+    'bg-green-500',
+    'rounded-lg',
+    'text-lg',
+    'font-semibold',
+    // add any other classes you use dynamically
   ],
   theme: {
     extend: {},
