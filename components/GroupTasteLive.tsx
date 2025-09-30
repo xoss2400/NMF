@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { fetchUserTaste } from "../lib/spotify";
 import { buildGroupProfile } from "../lib/groupProfile";
-import GroupProfileView from "./GroupProfileView";
+import GroupTasteDashboard from "./GroupTasteDashboard";
 
 export default function GroupTasteLive() {
   const { data: session, status } = useSession();
@@ -35,5 +35,5 @@ export default function GroupTasteLive() {
   if (loading) return <div className="p-4">Loading group profile...</div>;
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!groupProfile) return null;
-  return <GroupProfileView profile={groupProfile} />;
+  return <GroupTasteDashboard profile={groupProfile} />;
 }
