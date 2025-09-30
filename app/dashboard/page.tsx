@@ -1,18 +1,14 @@
-'use client'
+'use client';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
+import Link from 'next/link';
 
-
-import { useSession, signIn, signOut } from 'next-auth/react'
-import Recommendations from '../../components/Recommendations'
-import GroupProfileView from '../../components/GroupProfileView'
-import { fetchUserTaste } from '../../lib/spotify';
-import { buildGroupProfile } from '../../lib/groupProfile';
-import Link from 'next/link'
-import { generateGroupTaste } from '../../lib/groupTaste'
-import GroupTasteLive from '../../components/GroupTasteLive'
+import Recommendations from '../../components/Recommendations';
+import GroupTasteLive from '../../components/GroupTasteLive';
+import { generateGroupTaste } from '../../lib/groupTaste';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -25,69 +21,77 @@ export default function Dashboard() {
           Authorization: `Bearer ${(session as any).accessToken}`,
         },
       })
-        .then(res => res.json())
-        .then(data => setTracks(data.items));
+        .then((res) => res.json())
+        .then((data) => setTracks(data.items));
     }
   }, [session]);
 
-  if (status === "loading") {
-    return <div className="p-10">Loading...</div>;
+  if (status === 'loading') {
+    return (
+      <div className="h-screen flex items-center justify-center bg-black text-white text-xl">
+        Loading session...
+      </div>
+    );
   }
 
-  // Demo group taste data
-  const groupTasteDemo = generateGroupTaste([
-    {
-      userId: 'john',
-      topArtists: [
-        { id: '1', name: 'Kendrick Lamar' },
-        { id: '2', name: 'Phoebe Bridgers' },
-        { id: '3', name: 'Frank Ocean' },
-      ],
-    },
-    {
-      userId: 'sarah',
-      topArtists: [
-        { id: '2', name: 'Phoebe Bridgers' },
-        { id: '4', name: 'Tyler, The Creator' },
-        { id: '1', name: 'Kendrick Lamar' },
-      ],
-    },
-  ]);
+  if (status === 'unauthenticated') {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black text-white">
+        <h1 className="text-4xl font-bold mb-6">Welcome to Group Taste</h1>
+        <button
+          onClick={() => signIn('spotify')}
+          className="bg-green-500 hover:bg-green-400 text-black px-8 py-4 rounded-xl text-xl font-semibold shadow-md transition-all"
+        >
+          Connect Spotify
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-10">
-      <div className="flex justify-between mb-6">
-        <Link href="/">
-          <button className="bg-gray-700 text-white px-4 py-2 rounded">Home</button>
-        </Link>
-        {status === "authenticated" && (
-          <button onClick={() => signOut()} className="bg-red-500 text-white px-4 py-2 rounded">Sign Out</button>
-        )}
-      </div>
-      {status === "unauthenticated" ? (
-        <div className="flex flex-col items-center justify-center h-full">
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white p-6 sm:p-12">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-10">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Your Dashboard</h1>
+        <div className="flex gap-4">
+          <Link href="/">
+            <button className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-md transition">Home</button>
+          </Link>
           <button
-            onClick={() => signIn('spotify')}
-            className="bg-green-500 text-black px-6 py-3 rounded-xl text-lg font-semibold mb-4"
+            onClick={() => signOut()}
+            className="bg-red-500 hover:bg-red-400 px-4 py-2 rounded-md transition"
           >
-            Connect Spotify
+            Sign Out
           </button>
         </div>
-      ) : (
-        <>
-          <h1 className="text-2xl font-bold mb-4">Your Top Tracks</h1>
-          <ul className="grid grid-cols-2 gap-4">
-            {tracks.map((track: any) => (
-              <li key={track.id} className="bg-gray-800 p-4 rounded-xl">
-                {track.name} — {track.artists[0].name}
-              </li>
-            ))}
-          </ul>
-          <Recommendations userTracks={tracks} />
-          {/* Real group profile for current user (or group) */}
-          <GroupTasteLive />
-        </>
-      )}
+      </div>
+
+      {/* Top Tracks */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-semibold mb-6">Your Top Tracks</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tracks.map((track: any) => (
+            <div
+              key={track.id}
+              className="bg-zinc-800 hover:bg-zinc-700 p-5 rounded-xl transition shadow-md"
+            >
+              <h3 className="text-lg font-medium">{track.name}</h3>
+              <p className="text-sm text-gray-400">{track.artists[0].name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recommendations */}
+      <div className="mb-16">
+        {/* <Recommendations userTracks={tracks} /> */}
+      </div>
+
+      {/* Group Taste Section */}
+      <div className="pb-20">
+        <h2 className="text-2xl font-semibold mb-4">Your Group Taste</h2>
+        {/* <GroupTasteLive /> */}
+      </div>
     </div>
   );
 }
