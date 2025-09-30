@@ -1,16 +1,19 @@
 'use client'
 
-import { signIn } from 'next-auth/react'
+export const dynamic = 'force-dynamic'
+
+
+import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="flex h-screen items-center justify-center bg-black text-white">
-      <button
-        onClick={() => signIn('spotify')}
-        className="bg-green-500 text-black px-6 py-3 rounded-xl text-lg font-semibold"
-      >
-        Connect Spotify
-      </button>
+    <div className="p-10 flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-3xl font-bold mb-6">NMF</h1>
+      <Link href="/dashboard">
+        <button className="bg-green-500 text-black px-6 py-3 rounded-xl text-lg font-semibold">
+          Go to Dashboard
+        </button>
+      </Link>
     </div>
   )
 }
