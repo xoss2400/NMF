@@ -5,8 +5,10 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState } from 'react'
 
 
-import { useSession, signIn } from 'next-auth/react'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import Recommendations from '../../components/Recommendations'
+import Link from 'next/link'
+import { generateGroupTaste } from '../../lib/groupTaste'
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -28,8 +30,36 @@ export default function Dashboard() {
     return <div className="p-10">Loading...</div>;
   }
 
+  // Demo group taste data
+  const groupTasteDemo = generateGroupTaste([
+    {
+      userId: 'john',
+      topArtists: [
+        { id: '1', name: 'Kendrick Lamar' },
+        { id: '2', name: 'Phoebe Bridgers' },
+        { id: '3', name: 'Frank Ocean' },
+      ],
+    },
+    {
+      userId: 'sarah',
+      topArtists: [
+        { id: '2', name: 'Phoebe Bridgers' },
+        { id: '4', name: 'Tyler, The Creator' },
+        { id: '1', name: 'Kendrick Lamar' },
+      ],
+    },
+  ]);
+
   return (
     <div className="p-10">
+      <div className="flex justify-between mb-6">
+        <Link href="/">
+          <button className="bg-gray-700 text-white px-4 py-2 rounded">Home</button>
+        </Link>
+        {status === "authenticated" && (
+          <button onClick={() => signOut()} className="bg-red-500 text-white px-4 py-2 rounded">Sign Out</button>
+        )}
+      </div>
       {status === "unauthenticated" ? (
         <div className="flex flex-col items-center justify-center h-full">
           <button
@@ -50,6 +80,16 @@ export default function Dashboard() {
             ))}
           </ul>
           <Recommendations userTracks={tracks} />
+          <div className="mt-10">
+            <h2 className="text-xl font-bold mb-2">Demo Group Taste</h2>
+            <ul className="grid grid-cols-2 gap-2">
+              {groupTasteDemo.map(artist => (
+                <li key={artist.id} className="bg-gray-700 p-3 rounded">
+                  {artist.name} ({artist.frequency}) — {artist.users.join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>
         </>
       )}
     </div>
