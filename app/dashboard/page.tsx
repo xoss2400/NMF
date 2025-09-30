@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Recommendations from '../../components/Recommendations'
+import GroupTasteDemo from '../../components/GroupTasteDemo'
 import Link from 'next/link'
 import { generateGroupTaste } from '../../lib/groupTaste'
 
@@ -80,16 +81,7 @@ export default function Dashboard() {
             ))}
           </ul>
           <Recommendations userTracks={tracks} />
-          <div className="mt-10">
-            <h2 className="text-xl font-bold mb-2">Demo Group Taste</h2>
-            <ul className="grid grid-cols-2 gap-2">
-              {groupTasteDemo.map(artist => (
-                <li key={artist.id} className="bg-gray-700 p-3 rounded">
-                  {artist.name} ({artist.frequency}) — {artist.users.join(', ')}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <GroupTasteDemo />
         </>
       )}
     </div>
