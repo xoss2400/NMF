@@ -324,15 +324,16 @@ export default function GroupPage() {
           </HorizontalScroller>
         ))}
 
-        {/* 2. Top Genres */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">Group's Top Genres</h2>
-          <div className="flex flex-wrap gap-3">
-            {topGenres.map((genre, index) => (
+        {/* 2. Top Genres (horizontal chips) */}
+        <HorizontalScroller title={"Group's Top Genres"}>
+          {topGenres.length > 0 ? (
+            topGenres.map((genre, index) => (
               <GenreChip key={genre} genre={genre} index={index} />
-            ))}
-          </div>
-        </section>
+            ))
+          ) : (
+            <div className="flex-shrink-0 px-4 py-2 text-gray-400">No genres available</div>
+          )}
+        </HorizontalScroller>
 
         {/* 3. Song of the Day */}
         <section className="mb-8">
@@ -414,7 +415,7 @@ export default function GroupPage() {
         <HorizontalScroller title="Recently Released">
           {recentReleases.length > 0 ? (
             recentReleases.map((release) => (
-              <ReleaseCard key={release.id} release={release} />
+              <ReleaseCard key={release.id} release={release} className="w-40" />
             ))
           ) : (
             <div className="flex-shrink-0 w-40 flex items-center justify-center text-gray-400 text-sm">
@@ -424,14 +425,17 @@ export default function GroupPage() {
         </HorizontalScroller>
 
         {/* 5. Upcoming Releases (Most Important Feature) */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">Upcoming Releases</h2>
-          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-            {upcomingReleases.map((release) => (
-              <UpcomingReleaseCard key={release.id} release={release} />
-            ))}
-          </div>
-        </section>
+        <HorizontalScroller title="Upcoming Releases">
+          {upcomingReleases.length > 0 ? (
+            upcomingReleases.map((release) => (
+              <UpcomingReleaseCard key={release.id} release={release} className="w-56" />
+            ))
+          ) : (
+            <div className="flex-shrink-0 w-56 flex items-center justify-center text-gray-400 text-sm">
+              No upcoming releases
+            </div>
+          )}
+        </HorizontalScroller>
       </div>
     </div>
   );

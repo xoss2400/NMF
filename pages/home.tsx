@@ -219,15 +219,16 @@ export default function HomePage() {
               ))}
             </HorizontalScroller>
 
-            {/* Top Genres */}
-            <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 text-white">Your Top Genres</h2>
-              <div className="flex flex-wrap gap-3">
-                {userProfile.genres.slice(0, 10).map((genre: string, index: number) => (
+            {/* Top Genres (horizontal chips) */}
+            <HorizontalScroller title="Your Top Genres">
+              {userProfile.genres.slice(0, 10).length > 0 ? (
+                userProfile.genres.slice(0, 10).map((genre: string, index: number) => (
                   <GenreChip key={genre} genre={genre} index={index} />
-                ))}
-              </div>
-            </section>
+                ))
+              ) : (
+                <div className="flex-shrink-0 px-4 py-2 text-gray-400">No genres available</div>
+              )}
+            </HorizontalScroller>
           </div>
         )}
 

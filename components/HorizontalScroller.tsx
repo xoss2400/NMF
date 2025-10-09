@@ -9,9 +9,11 @@ interface HorizontalScrollerProps {
 export default function HorizontalScroller({ title, children, className = "" }: HorizontalScrollerProps) {
   return (
     <section className={`mb-8 ${className}`}>
-      <h2 className="text-2xl font-bold mb-4 text-white">{title}</h2>
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-        {children}
+      {title && <h2 className="text-2xl font-bold mb-4 text-white">{title}</h2>}
+      <div className="max-w-7xl mx-auto">
+        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-2">
+          {children}
+        </div>
       </div>
     </section>
   );
@@ -32,7 +34,7 @@ interface TrackCardProps {
 
 export function TrackCard({ track, className = "w-40" }: TrackCardProps) {
   return (
-    <div className={`flex-shrink-0 ${className}`}>
+    <div className={`flex-shrink-0 ${className} snap-center`}>
       <div className="relative group">
         <img
           src={track.album.images[0]?.url || '/placeholder-album.png'}
@@ -59,7 +61,7 @@ interface ArtistCardProps {
 
 export function ArtistCard({ artist, className = "w-40" }: ArtistCardProps) {
   return (
-    <div className={`flex-shrink-0 ${className}`}>
+    <div className={`flex-shrink-0 ${className} snap-center`}>
       <div className="relative group">
         <img
           src={artist.images[0]?.url || '/placeholder-artist.png'}
@@ -81,7 +83,7 @@ interface GenreChipProps {
 
 export function GenreChip({ genre, index }: GenreChipProps) {
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#1DB954] text-black">
+    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#1DB954] text-black flex-shrink-0 snap-center">
       {index !== undefined && `#${index + 1} `}{genre}
     </span>
   );
@@ -103,7 +105,7 @@ interface SongOfDayCardProps {
 
 export function SongOfDayCard({ song, className = "w-40" }: SongOfDayCardProps) {
   return (
-    <div className={`flex-shrink-0 ${className}`}>
+    <div className={`flex-shrink-0 ${className} snap-center`}>
       <div className="relative group">
         <img
           src={song.track.albumCover || '/placeholder-album.png'}
@@ -134,7 +136,7 @@ interface ReleaseCardProps {
 
 export function ReleaseCard({ release, className = "w-40" }: ReleaseCardProps) {
   return (
-    <div className={`flex-shrink-0 ${className}`}>
+    <div className={`flex-shrink-0 ${className} snap-center`}>
       <div className="relative group">
         <img
           src={release.albumCover || '/placeholder-album.png'}
@@ -179,7 +181,7 @@ export function UpcomingReleaseCard({ release, className = "w-56" }: UpcomingRel
   };
 
   return (
-    <div className={`flex-shrink-0 ${className}`}>
+    <div className={`flex-shrink-0 ${className} snap-center`}>
       <div className="relative group">
         <div className="w-full aspect-square bg-gray-800 rounded-xl flex items-center justify-center overflow-hidden">
           {release.cover ? (
