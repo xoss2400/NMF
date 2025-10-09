@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import HorizontalScroller, { TrackCard, ArtistCard, GenreChip } from "../components/HorizontalScroller";
 
 interface JoinGroupModalProps {
   onJoin: () => void;
@@ -204,79 +204,46 @@ export default function HomePage() {
             <div className="text-white">Loading your music profile...</div>
           </div>
         ) : userProfile && (
-          <div className="mb-8 p-6 bg-gray-900 rounded-lg border border-gray-800">
-            <h2 className="text-2xl font-bold mb-4">Your Music Profile</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Top Tracks</h3>
-                <div className="space-y-2">
-                  {userProfile.tracks.slice(0, 3).map((track: any) => (
-                    <div key={track.id} className="flex items-center gap-3">
-                      <Image
-                        src={track.album.images[0]?.url || '/placeholder-album.png'}
-                        alt={`${track.name} album cover`}
-                        width={40}
-                        height={40}
-                        className="rounded"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{track.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{track.artists[0]?.name}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          <div className="mb-8">
+            {/* Top Tracks */}
+            <HorizontalScroller title="Your Top Tracks">
+              {userProfile.tracks.slice(0, 10).map((track: any) => (
+                <TrackCard key={track.id} track={track} />
+              ))}
+            </HorizontalScroller>
+
+            {/* Top Artists */}
+            <HorizontalScroller title="Your Top Artists">
+              {userProfile.artists.slice(0, 10).map((artist: any) => (
+                <ArtistCard key={artist.id} artist={artist} />
+              ))}
+            </HorizontalScroller>
+
+            {/* Top Genres */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-bold mb-4 text-white">Your Top Genres</h2>
+              <div className="flex flex-wrap gap-3">
+                {userProfile.genres.slice(0, 10).map((genre: string, index: number) => (
+                  <GenreChip key={genre} genre={genre} index={index} />
+                ))}
               </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Top Artists</h3>
-                <div className="space-y-2">
-                  {userProfile.artists.slice(0, 3).map((artist: any) => (
-                    <div key={artist.id} className="flex items-center gap-3">
-                      <Image
-                        src={artist.images[0]?.url || '/placeholder-artist.png'}
-                        alt={`${artist.name} profile`}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{artist.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{artist.genres[0]}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Top Genres</h3>
-                <div className="flex flex-wrap gap-2">
-                  {userProfile.genres.slice(0, 5).map((genre: string) => (
-                    <span
-                      key={genre}
-                      className="px-2 py-1 bg-[#1DB954] text-black text-xs font-medium rounded-full"
-                    >
-                      {genre}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+            </section>
           </div>
         )}
 
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold">Your Groups</h2>
+          <h2 className="text-3xl font-bold text-white">Your Groups</h2>
           <div className="flex gap-4">
             <JoinGroupModal onJoin={fetchUserGroups} />
             <Link
               href="/groups"
-              className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors"
+              className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors text-white"
             >
               View All Groups
             </Link>
             <Link
               href="/groups/new"
-              className="px-6 py-3 bg-[#1DB954] hover:bg-[#1ed760] rounded-lg font-semibold transition-colors"
+              className="px-6 py-3 bg-[#1DB954] hover:bg-[#1ed760] rounded-lg font-semibold transition-colors text-white"
             >
               Create New Group
             </Link>
@@ -287,13 +254,13 @@ export default function HomePage() {
         {groups.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🎵</div>
-            <h3 className="text-xl font-semibold mb-2">No groups yet</h3>
-            <p className="text-white mb-6">
+            <h3 className="text-xl font-semibold mb-2 text-white">No groups yet</h3>
+            <p className="text-gray-300 mb-6">
               Create your first group to start discovering music with friends!
             </p>
             <Link
               href="/groups/new"
-              className="px-6 py-3 bg-[#1DB954] hover:bg-[#1ed760] rounded-lg font-semibold transition-colors"
+              className="px-6 py-3 bg-[#1DB954] hover:bg-[#1ed760] rounded-lg font-semibold transition-colors text-white"
             >
               Create Your First Group
             </Link>
@@ -304,17 +271,17 @@ export default function HomePage() {
               <Link
                 key={group.id}
                 href={`/groups/${group.id}`}
-                className="block p-6 bg-gray-900 hover:bg-gray-800 rounded-lg border border-gray-800 transition-colors"
+                className="block p-6 bg-gray-900 hover:bg-gray-800 rounded-xl border border-gray-800 transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
               >
-                <h3 className="text-xl font-semibold mb-2">{group.name}</h3>
-                <p className="text-white text-sm mb-4">
+                <h3 className="text-xl font-semibold mb-2 text-white">{group.name}</h3>
+                <p className="text-gray-300 text-sm mb-4">
                   {group.memberCount} member{group.memberCount !== 1 ? 's' : ''}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-300">
+                  <span className="text-xs text-gray-400">
                     Created {new Date(group.createdAt).toLocaleDateString()}
                   </span>
-                  <div className="text-[#1DB954]">→</div>
+                  <div className="text-[#1DB954] text-lg">→</div>
                 </div>
               </Link>
             ))}
@@ -323,18 +290,18 @@ export default function HomePage() {
 
         {/* Quick Stats */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 bg-gray-900 rounded-lg border border-gray-800">
-            <h3 className="text-lg font-semibold mb-2">Total Groups</h3>
+          <div className="p-6 bg-gray-900 rounded-xl border border-gray-800 hover:bg-gray-800 transition-colors">
+            <h3 className="text-lg font-semibold mb-2 text-white">Total Groups</h3>
             <p className="text-3xl font-bold text-[#1DB954]">{groups.length}</p>
           </div>
-          <div className="p-6 bg-gray-900 rounded-lg border border-gray-800">
-            <h3 className="text-lg font-semibold mb-2">Total Members</h3>
+          <div className="p-6 bg-gray-900 rounded-xl border border-gray-800 hover:bg-gray-800 transition-colors">
+            <h3 className="text-lg font-semibold mb-2 text-white">Total Members</h3>
             <p className="text-3xl font-bold text-[#1DB954]">
               {groups.reduce((sum, group) => sum + group.memberCount, 0)}
             </p>
           </div>
-          <div className="p-6 bg-gray-900 rounded-lg border border-gray-800">
-            <h3 className="text-lg font-semibold mb-2">Songs Discovered</h3>
+          <div className="p-6 bg-gray-900 rounded-xl border border-gray-800 hover:bg-gray-800 transition-colors">
+            <h3 className="text-lg font-semibold mb-2 text-white">Songs Discovered</h3>
             <p className="text-3xl font-bold text-[#1DB954]">0</p>
           </div>
         </div>

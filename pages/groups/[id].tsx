@@ -3,7 +3,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import HorizontalScroller, { 
+  TrackCard, 
+  ArtistCard, 
+  GenreChip, 
+  SongOfDayCard, 
+  ReleaseCard, 
+  UpcomingReleaseCard 
+} from "../../components/HorizontalScroller";
 
 interface GroupMember {
   id: string;
@@ -278,22 +285,23 @@ export default function GroupPage() {
   return (
     <div className="min-h-screen bg-[#191414] text-white">
       {/* Header */}
-      <div className="border-b border-gray-800 px-6 py-4">
+      <div className="border-b border-gray-800 px-6 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/home"
-              className="text-white hover:text-yellow-300 transition-colors"
+              className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              ← Back to Groups
+              <span className="text-lg">←</span>
+              <span>Back to Groups</span>
             </Link>
-            <h1 className="text-2xl font-bold text-yellow-300">{group?.name || 'Loading...'}</h1>
+            <h1 className="text-3xl font-bold text-white">{group?.name || 'Loading...'}</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-white">
+            <span className="text-sm text-gray-300">
               {members.length} member{members.length !== 1 ? 's' : ''}
             </span>
-            <button className="px-4 py-2 bg-[#1DB954] hover:bg-[#1ed760] rounded-lg transition-colors">
+            <button className="px-6 py-2 bg-[#1DB954] hover:bg-[#1ed760] rounded-lg transition-colors text-white font-semibold">
               Invite Friends
             </button>
           </div>
@@ -302,62 +310,37 @@ export default function GroupPage() {
 
       <div className="px-6 py-8 space-y-12">
         {/* 1. Top Songs This Week */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6">Top Songs This Week</h2>
-          <div className="space-y-6">
-            {members.map((member) => (
-              <div key={member.id}>
-                <h3 className="text-lg font-semibold mb-3 text-white">{member.name}'s Top Tracks</h3>
-                <div className="flex gap-4 overflow-x-auto pb-4">
-                  {member.topTracks && member.topTracks.length > 0 ? (
-                    member.topTracks.map((track) => (
-                      <div key={track.id} className="flex-shrink-0 w-48">
-                        <div className="relative">
-                          <Image
-                            src={track.album.images[0]?.url || '/placeholder-album.png'}
-                            alt={`${track.name} album cover`}
-                            width={192}
-                            height={192}
-                            className="rounded-lg"
-                          />
-                        </div>
-                        <div className="mt-2">
-                          <p className="font-medium truncate">{track.name}</p>
-                          <p className="text-sm text-gray-300 truncate">{track.artists[0]?.name}</p>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-gray-400 text-sm">No tracks available</div>
-                  )}
-                </div>
+        {members.map((member) => (
+          <HorizontalScroller key={member.id} title={`${member.name}'s Top Tracks`}>
+            {member.topTracks && member.topTracks.length > 0 ? (
+              member.topTracks.map((track) => (
+                <TrackCard key={track.id} track={track} />
+              ))
+            ) : (
+              <div className="flex-shrink-0 w-40 flex items-center justify-center text-gray-400 text-sm">
+                No tracks available
               </div>
-            ))}
-          </div>
-        </section>
+            )}
+          </HorizontalScroller>
+        ))}
 
         {/* 2. Top Genres */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6">Group's Top Genres</h2>
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-white">Group's Top Genres</h2>
           <div className="flex flex-wrap gap-3">
             {topGenres.map((genre, index) => (
-              <span
-                key={genre}
-                className="px-4 py-2 bg-[#1DB954] text-black font-semibold rounded-full"
-              >
-                #{index + 1} {genre}
-              </span>
+              <GenreChip key={genre} genre={genre} index={index} />
             ))}
           </div>
         </section>
 
         {/* 3. Song of the Day */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Song of the Day</h2>
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-white">Song of the Day</h2>
             <button 
               onClick={() => setShowSongSearch(!showSongSearch)}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-white"
             >
               {showSongSearch ? 'Cancel' : 'Submit Song'}
             </button>
@@ -365,21 +348,21 @@ export default function GroupPage() {
 
           {/* Song Search Modal */}
           {showSongSearch && (
-            <div className="mb-6 p-6 bg-gray-900 rounded-lg border border-gray-800">
-              <h3 className="text-lg font-semibold mb-4">Search and Submit a Song</h3>
+            <div className="mb-6 p-6 bg-gray-900 rounded-xl border border-gray-800">
+              <h3 className="text-lg font-semibold mb-4 text-white">Search and Submit a Song</h3>
               <div className="flex gap-4 mb-4">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && searchSongs(searchQuery)}
-                  className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#1DB954] focus:border-transparent"
+                  className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#1DB954] focus:border-transparent text-white placeholder-gray-400"
                   placeholder="Search for a song..."
                 />
                 <button
                   onClick={() => searchSongs(searchQuery)}
                   disabled={searching || !searchQuery.trim()}
-                  className="px-6 py-2 bg-[#1DB954] hover:bg-[#1ed760] disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors"
+                  className="px-6 py-2 bg-[#1DB954] hover:bg-[#1ed760] disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors text-white"
                 >
                   {searching ? 'Searching...' : 'Search'}
                 </button>
@@ -391,10 +374,10 @@ export default function GroupPage() {
                   {searchResults.map((track) => (
                     <div
                       key={track.id}
-                      className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 cursor-pointer"
+                      className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors"
                       onClick={() => submitSongOfTheDay(track)}
                     >
-                      <Image
+                      <img
                         src={track.album.images[0]?.url || '/placeholder-album.png'}
                         alt={`${track.name} album cover`}
                         width={40}
@@ -402,10 +385,10 @@ export default function GroupPage() {
                         className="rounded"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{track.name}</p>
+                        <p className="font-medium truncate text-white">{track.name}</p>
                         <p className="text-sm text-gray-400 truncate">{track.artists[0]?.name}</p>
                       </div>
-                      <div className="text-[#1DB954]">+</div>
+                      <div className="text-[#1DB954] text-lg">+</div>
                     </div>
                   ))}
                 </div>
@@ -414,107 +397,38 @@ export default function GroupPage() {
           )}
 
           {/* Songs of the Day Display */}
-          <div className="flex gap-4 overflow-x-auto pb-4">
+          <HorizontalScroller title="">
             {songsOfTheDay.length > 0 ? (
               songsOfTheDay.map((song) => (
-                <div key={song.id} className="flex-shrink-0 w-48">
-                  <div className="relative">
-                    <Image
-                      src={song.track.albumCover || '/placeholder-album.png'}
-                      alt={`${song.track.name} album cover`}
-                      width={192}
-                      height={192}
-                      className="rounded-lg"
-                    />
-                  </div>
-                  <div className="mt-2">
-                    <p className="font-medium truncate">{song.track.name}</p>
-                    <p className="text-sm text-gray-300 truncate">{song.track.artist}</p>
-                    <p className="text-xs text-[#1DB954] mt-1">by {song.submittedBy}</p>
-                  </div>
-                </div>
+                <SongOfDayCard key={song.id} song={song} />
               ))
             ) : (
-              <div className="text-gray-400 text-sm">No songs submitted yet</div>
+              <div className="flex-shrink-0 w-40 flex items-center justify-center text-gray-400 text-sm">
+                No songs submitted yet
+              </div>
             )}
-          </div>
+          </HorizontalScroller>
         </section>
 
         {/* 4. Recently Released */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6">Recently Released</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {recentReleases.length > 0 ? (
-              recentReleases.map((release) => (
-                <div key={release.id} className="flex-shrink-0 w-48">
-                  <div className="relative">
-                    <Image
-                      src={release.albumCover || '/placeholder-album.png'}
-                      alt={`${release.name} album cover`}
-                      width={192}
-                      height={192}
-                      className="rounded-lg"
-                    />
-                    <div className="absolute top-2 right-2 bg-black bg-opacity-75 px-2 py-1 rounded text-xs">
-                      {release.type}
-                    </div>
-                  </div>
-                  <div className="mt-2">
-                    <p className="font-medium truncate">{release.name}</p>
-                    <p className="text-sm text-gray-300 truncate">{release.artist}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {new Date(release.releaseDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-gray-400 text-sm">Loading recent releases...</div>
-            )}
-          </div>
-        </section>
+        <HorizontalScroller title="Recently Released">
+          {recentReleases.length > 0 ? (
+            recentReleases.map((release) => (
+              <ReleaseCard key={release.id} release={release} />
+            ))
+          ) : (
+            <div className="flex-shrink-0 w-40 flex items-center justify-center text-gray-400 text-sm">
+              Loading recent releases...
+            </div>
+          )}
+        </HorizontalScroller>
 
         {/* 5. Upcoming Releases (Most Important Feature) */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6">Upcoming Releases</h2>
-          <div className="flex gap-6 overflow-x-auto pb-4">
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-white">Upcoming Releases</h2>
+          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {upcomingReleases.map((release) => (
-              <div key={release.id} className="flex-shrink-0 w-96">
-                <div className="relative">
-                  <div className="w-96 h-96 bg-gray-800 rounded-lg flex items-center justify-center">
-                    {release.cover ? (
-                      <Image
-                        src={release.cover}
-                        alt={`${release.name} cover`}
-                        width={384}
-                        height={384}
-                        className="rounded-lg"
-                      />
-                    ) : (
-                      <div className="text-center">
-                        <div className="text-6xl mb-2">🎵</div>
-                        <p className="text-sm text-gray-400">Cover TBA</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="absolute top-4 right-4 bg-black bg-opacity-75 px-3 py-1 rounded text-sm">
-                    {release.type}
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <p className="font-bold text-lg truncate">{release.name}</p>
-                  <p className="text-gray-300 truncate">{release.artist}</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {new Date(release.releaseDate).toLocaleDateString()}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-sm">Recommendation:</span>
-                    <div className="flex">
-                      {renderStars(release.recommendationRating)}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <UpcomingReleaseCard key={release.id} release={release} />
             ))}
           </div>
         </section>
