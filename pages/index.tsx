@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 
 export default function LandingPage() {
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-[#191414] font-sans text-center">
+    <div className="relative flex items-center justify-center min-h-screen bg-[#191414] text-white font-sans text-center">
 
       {/* Neon Title */}
       <h1 className="absolute top-12 text-6xl font-extrabold text-yellow-300 tracking-tight 
