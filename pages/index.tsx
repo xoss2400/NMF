@@ -30,7 +30,7 @@ export default function LandingPage() {
         </button>
 
         {/* Apple Music (placeholder) */}
-        <button className="px-8 py-4 rounded-full bg-black text-white hover:bg-gray-800 transition-all shadow">
+        <button className="px-8 py-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-all shadow">
           Apple Music
         </button>
 

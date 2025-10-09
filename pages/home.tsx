@@ -52,7 +52,7 @@ export default function HomePage() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-yellow-300">New Music Friday</h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-white">
               Welcome, {session?.user?.name || session?.user?.email}
             </span>
             <button
@@ -82,7 +82,7 @@ export default function HomePage() {
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🎵</div>
             <h3 className="text-xl font-semibold mb-2">No groups yet</h3>
-            <p className="text-gray-400 mb-6">
+            <p className="text-white mb-6">
               Create your first group to start discovering music with friends!
             </p>
             <Link
@@ -101,11 +101,11 @@ export default function HomePage() {
                 className="block p-6 bg-gray-900 hover:bg-gray-800 rounded-lg border border-gray-800 transition-colors"
               >
                 <h3 className="text-xl font-semibold mb-2">{group.name}</h3>
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-white text-sm mb-4">
                   {group.memberCount} member{group.memberCount !== 1 ? 's' : ''}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-300">
                     Created {new Date(group.createdAt).toLocaleDateString()}
                   </span>
                   <div className="text-[#1DB954]">→</div>

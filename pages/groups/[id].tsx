@@ -155,14 +155,14 @@ export default function GroupPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/home"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-white hover:text-yellow-300 transition-colors"
             >
               ← Back to Groups
             </Link>
             <h1 className="text-2xl font-bold text-yellow-300">{groupName}</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-white">
               {members.length} member{members.length !== 1 ? 's' : ''}
             </span>
             <button className="px-4 py-2 bg-[#1DB954] hover:bg-[#1ed760] rounded-lg transition-colors">
@@ -179,7 +179,7 @@ export default function GroupPage() {
           <div className="space-y-6">
             {members.map((member) => (
               <div key={member.id}>
-                <h3 className="text-lg font-semibold mb-3 text-gray-300">{member.name}'s Top Tracks</h3>
+                <h3 className="text-lg font-semibold mb-3 text-white">{member.name}'s Top Tracks</h3>
                 <div className="flex gap-4 overflow-x-auto pb-4">
                   {member.topTracks.map((track) => (
                     <div key={track.id} className="flex-shrink-0 w-48">
@@ -194,7 +194,7 @@ export default function GroupPage() {
                       </div>
                       <div className="mt-2">
                         <p className="font-medium truncate">{track.name}</p>
-                        <p className="text-sm text-gray-400 truncate">{track.artist}</p>
+                        <p className="text-sm text-gray-300 truncate">{track.artist}</p>
                       </div>
                     </div>
                   ))}
@@ -241,7 +241,7 @@ export default function GroupPage() {
                 </div>
                 <div className="mt-2">
                   <p className="font-medium truncate">{song.track.name}</p>
-                  <p className="text-sm text-gray-400 truncate">{song.track.artist}</p>
+                  <p className="text-sm text-gray-300 truncate">{song.track.artist}</p>
                   <p className="text-xs text-[#1DB954] mt-1">by {song.submittedBy}</p>
                 </div>
               </div>
@@ -269,7 +269,7 @@ export default function GroupPage() {
                 </div>
                 <div className="mt-2">
                   <p className="font-medium truncate">{release.name}</p>
-                  <p className="text-sm text-gray-400 truncate">{release.artist}</p>
+                  <p className="text-sm text-gray-300 truncate">{release.artist}</p>
                   <p className="text-xs text-gray-500 mt-1">
                     {new Date(release.releaseDate).toLocaleDateString()}
                   </p>
@@ -308,7 +308,7 @@ export default function GroupPage() {
                 </div>
                 <div className="mt-4">
                   <p className="font-bold text-lg truncate">{release.name}</p>
-                  <p className="text-gray-400 truncate">{release.artist}</p>
+                  <p className="text-gray-300 truncate">{release.artist}</p>
                   <p className="text-sm text-gray-500 mt-2">
                     {new Date(release.releaseDate).toLocaleDateString()}
                   </p>

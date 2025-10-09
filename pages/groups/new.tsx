@@ -51,7 +51,7 @@ export default function NewGroupPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/home"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-white hover:text-yellow-300 transition-colors"
             >
               ← Back to Home
             </Link>
@@ -125,7 +125,7 @@ export default function NewGroupPage() {
         {/* Info Section */}
         <div className="mt-12 p-6 bg-gray-900 rounded-lg border border-gray-800">
           <h3 className="text-lg font-semibold mb-3">What happens next?</h3>
-          <ul className="space-y-2 text-sm text-gray-300">
+          <ul className="space-y-2 text-sm text-white">
             <li>• You'll be added as the group admin</li>
             <li>• Share the group code with friends to invite them</li>
             <li>• Start discovering music together with group features</li>
