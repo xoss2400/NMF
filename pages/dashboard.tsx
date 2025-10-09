@@ -17,7 +17,7 @@ export default function DashboardPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#191414]">
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)] bg-[#191414]">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
@@ -25,3 +25,4 @@ export default function DashboardPage() {
 
   return null;
 }
+// Redirects to /home if authenticated, otherwise to /
