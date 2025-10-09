@@ -263,7 +263,7 @@ export default function GroupPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#191414]">
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)] bg-[#191414]">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
@@ -282,7 +282,7 @@ export default function GroupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#191414] text-white">
+    <div className="min-h-[calc(100vh-4rem)] bg-[#191414] text-white">
       {/* Header */}
       <div className="border-b border-gray-800 px-6 py-6">
         <div className="flex items-center justify-between">

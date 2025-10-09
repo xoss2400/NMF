@@ -47,7 +47,7 @@ const mockUpcoming = Array.from({ length: 5 }).map((_, i) => ({
 
 export default function ScrollersDemoPage() {
   return (
-    <div className="min-h-screen bg-[#191414] text-white px-6 py-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-[#191414] text-white px-6 py-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Scroller Demo</h1>

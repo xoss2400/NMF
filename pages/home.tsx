@@ -67,7 +67,7 @@ export default function Home() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
         <div className="text-white">Loading...</div>
       </div>
     );
@@ -76,7 +76,7 @@ export default function Home() {
   if (status === 'unauthenticated') return null;
 
   return (
-    <div>
+    <div className="min-h-[calc(100vh-4rem)] bg-[#191414] text-white">
       {/* Top Tracks */}
       <HorizontalScroller title="Your Top Tracks">
         {profile?.tracks?.slice(0, 12)?.length > 0 ? (
