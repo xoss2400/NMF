@@ -24,11 +24,32 @@ export default function NewGroupPage() {
 
     setLoading(true);
     
-    // Mock API call - in real app, create group via API
-    setTimeout(() => {
-      const newGroupId = Math.random().toString(36).substr(2, 9);
-      router.push(`/groups/${newGroupId}`);
-    }, 1000);
+    try {
+      const response = await fetch('/api/groups', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: groupName,
+          description,
+          isPrivate
+        }),
+      });
+
+      if (response.ok) {
+        const newGroup = await response.json();
+        router.push(`/groups/${newGroup.id}`);
+      } else {
+        const error = await response.json();
+        alert(`Error creating group: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error creating group:', error);
+      alert('Failed to create group. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (status === "loading") {

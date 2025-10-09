@@ -8,13 +8,21 @@ import Image from "next/image";
 interface GroupMember {
   id: string;
   name: string;
-  avatar?: string;
-  topTracks: Array<{
-    id: string;
-    name: string;
-    artist: string;
-    albumCover: string;
-  }>;
+  spotifyId: string;
+  joinedAt: string;
+  topTracks?: any[];
+  topArtists?: any[];
+  genres?: string[];
+}
+
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  isPrivate: boolean;
+  members: GroupMember[];
+  createdAt: string;
+  createdBy: string;
 }
 
 interface SongOfTheDay {
@@ -53,13 +61,17 @@ export default function GroupPage() {
   const router = useRouter();
   const { id } = router.query;
   
-  const [groupName, setGroupName] = useState("College Friends");
+  const [group, setGroup] = useState<Group | null>(null);
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [topGenres, setTopGenres] = useState<string[]>([]);
   const [songsOfTheDay, setSongsOfTheDay] = useState<SongOfTheDay[]>([]);
   const [recentReleases, setRecentReleases] = useState<RecentRelease[]>([]);
   const [upcomingReleases, setUpcomingReleases] = useState<UpcomingRelease[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSongSearch, setShowSongSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -68,64 +80,180 @@ export default function GroupPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (id) {
-      // Mock data - in real app, fetch from API
-      const mockMembers: GroupMember[] = [
-        {
-          id: "1",
-          name: "Alex",
-          topTracks: [
-            { id: "1", name: "Blinding Lights", artist: "The Weeknd", albumCover: "https://i.scdn.co/image/ab67616d0000b2738863bc11d2aa12b54f5aeb36" },
-            { id: "2", name: "Watermelon Sugar", artist: "Harry Styles", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7" },
-            { id: "3", name: "Levitating", artist: "Dua Lipa", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7" },
-          ]
-        },
-        {
-          id: "2", 
-          name: "Sam",
-          topTracks: [
-            { id: "4", name: "Good 4 U", artist: "Olivia Rodrigo", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7" },
-            { id: "5", name: "Industry Baby", artist: "Lil Nas X", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7" },
-            { id: "6", name: "Stay", artist: "The Kid LAROI", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7" },
-          ]
-        }
-      ];
+    if (id && status === "authenticated") {
+      fetchGroupData();
+    }
+  }, [id, status]);
 
-      const mockSongsOfTheDay: SongOfTheDay[] = [
-        {
-          id: "1",
-          track: { id: "1", name: "Anti-Hero", artist: "Taylor Swift", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7" },
-          submittedBy: "Alex",
-          submittedAt: "2024-01-15"
-        },
-        {
-          id: "2", 
-          track: { id: "2", name: "As It Was", artist: "Harry Styles", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7" },
-          submittedBy: "Sam",
-          submittedAt: "2024-01-15"
-        }
-      ];
-
-      const mockRecentReleases: RecentRelease[] = [
-        { id: "1", name: "Midnights", artist: "Taylor Swift", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7", releaseDate: "2024-01-10", type: "album" },
-        { id: "2", name: "Harry's House", artist: "Harry Styles", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7", releaseDate: "2024-01-08", type: "album" },
-        { id: "3", name: "Future Nostalgia", artist: "Dua Lipa", albumCover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7", releaseDate: "2024-01-05", type: "album" },
-      ];
-
-      const mockUpcomingReleases: UpcomingRelease[] = [
-        { id: "1", name: "The Tortured Poets Department", artist: "Taylor Swift", releaseDate: "2024-04-19", recommendationRating: 5, type: "album" },
-        { id: "2", name: "Radical Optimism", artist: "Dua Lipa", releaseDate: "2024-05-03", recommendationRating: 4, type: "album" },
-        { id: "3", name: "New Single", artist: "Harry Styles", releaseDate: "2024-03-15", recommendationRating: 3, type: "single" },
-      ];
-
-      setMembers(mockMembers);
-      setTopGenres(["Pop", "Indie", "Alternative", "Electronic", "Hip-Hop"]);
-      setSongsOfTheDay(mockSongsOfTheDay);
-      setRecentReleases(mockRecentReleases);
-      setUpcomingReleases(mockUpcomingReleases);
+  const fetchGroupData = async () => {
+    try {
+      // Fetch group info
+      const groupResponse = await fetch(`/api/groups/${id}`);
+      if (groupResponse.ok) {
+        const groupData = await groupResponse.json();
+        setGroup(groupData);
+        setMembers(groupData.members);
+        
+        // Fetch member data and aggregate genres
+        await fetchMemberData(groupData.members);
+        
+        // Fetch other data
+        await Promise.all([
+          fetchRecentReleases(),
+          fetchUpcomingReleases(),
+          fetchSongsOfTheDay()
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching group data:', error);
+    } finally {
       setLoading(false);
     }
-  }, [id]);
+  };
+
+  const fetchMemberData = async (members: GroupMember[]) => {
+    // For now, we'll use the current user's data as a placeholder
+    // In a real app, you'd fetch each member's Spotify data
+    try {
+      const profileResponse = await fetch('/api/user/profile');
+      if (profileResponse.ok) {
+        const profile = await profileResponse.json();
+        
+        // Aggregate genres from all members (using current user's data as example)
+        const allGenres = profile.genres;
+        setTopGenres(allGenres.slice(0, 5));
+        
+        // Update members with their data
+        const updatedMembers = members.map(member => ({
+          ...member,
+          topTracks: member.spotifyId === session?.user?.email ? profile.tracks.slice(0, 3) : [],
+          topArtists: member.spotifyId === session?.user?.email ? profile.artists.slice(0, 3) : [],
+          genres: member.spotifyId === session?.user?.email ? profile.genres : []
+        }));
+        setMembers(updatedMembers);
+      }
+    } catch (error) {
+      console.error('Error fetching member data:', error);
+    }
+  };
+
+  const fetchRecentReleases = async () => {
+    try {
+      const response = await fetch('/api/spotify/new-releases');
+      if (response.ok) {
+        const data = await response.json();
+        const releases = data.albums.items.slice(0, 5).map((album: any) => ({
+          id: album.id,
+          name: album.name,
+          artist: album.artists[0]?.name || 'Unknown Artist',
+          albumCover: album.images[0]?.url || '',
+          releaseDate: album.release_date,
+          type: album.album_type as 'album' | 'single'
+        }));
+        setRecentReleases(releases);
+      }
+    } catch (error) {
+      console.error('Error fetching recent releases:', error);
+    }
+  };
+
+  const fetchUpcomingReleases = async () => {
+    // For now, we'll use a curated list of known upcoming releases
+    // In a real app, you'd integrate with a service like MusicBrainz or Last.fm
+    // that tracks upcoming album releases
+    const upcomingReleases: UpcomingRelease[] = [
+      { 
+        id: "1", 
+        name: "The Tortured Poets Department", 
+        artist: "Taylor Swift", 
+        releaseDate: "2024-04-19", 
+        recommendationRating: 5, 
+        type: "album",
+        cover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7"
+      },
+      { 
+        id: "2", 
+        name: "Radical Optimism", 
+        artist: "Dua Lipa", 
+        releaseDate: "2024-05-03", 
+        recommendationRating: 4, 
+        type: "album",
+        cover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7"
+      },
+      { 
+        id: "3", 
+        name: "New Single", 
+        artist: "Harry Styles", 
+        releaseDate: "2024-03-15", 
+        recommendationRating: 3, 
+        type: "single",
+        cover: "https://i.scdn.co/image/ab67616d0000b273f7b7174bef6f3fbfda3a0bb7"
+      },
+    ];
+    setUpcomingReleases(upcomingReleases);
+  };
+
+  const fetchSongsOfTheDay = async () => {
+    try {
+      const response = await fetch(`/api/groups/${id}/song-of-day`);
+      if (response.ok) {
+        const songs = await response.json();
+        setSongsOfTheDay(songs);
+      }
+    } catch (error) {
+      console.error('Error fetching songs of the day:', error);
+    }
+  };
+
+  const searchSongs = async (query: string) => {
+    if (!query.trim()) return;
+    
+    setSearching(true);
+    try {
+      const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(query)}&type=track&limit=10`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.tracks.items);
+      }
+    } catch (error) {
+      console.error('Error searching songs:', error);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const submitSongOfTheDay = async (track: any) => {
+    try {
+      const response = await fetch(`/api/groups/${id}/song-of-day`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          track: {
+            id: track.id,
+            name: track.name,
+            artist: track.artists[0]?.name,
+            albumCover: track.album.images[0]?.url,
+            spotifyUrl: track.external_urls.spotify
+          }
+        }),
+      });
+
+      if (response.ok) {
+        await fetchSongsOfTheDay();
+        setShowSongSearch(false);
+        setSearchQuery("");
+        setSearchResults([]);
+      } else {
+        const error = await response.json();
+        alert(`Error submitting song: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error submitting song:', error);
+      alert('Failed to submit song. Please try again.');
+    }
+  };
 
   if (status === "loading" || loading) {
     return (
@@ -159,7 +287,7 @@ export default function GroupPage() {
             >
               ← Back to Groups
             </Link>
-            <h1 className="text-2xl font-bold text-yellow-300">{groupName}</h1>
+            <h1 className="text-2xl font-bold text-yellow-300">{group?.name || 'Loading...'}</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-white">
@@ -181,23 +309,27 @@ export default function GroupPage() {
               <div key={member.id}>
                 <h3 className="text-lg font-semibold mb-3 text-white">{member.name}'s Top Tracks</h3>
                 <div className="flex gap-4 overflow-x-auto pb-4">
-                  {member.topTracks.map((track) => (
-                    <div key={track.id} className="flex-shrink-0 w-48">
-                      <div className="relative">
-                        <Image
-                          src={track.albumCover}
-                          alt={`${track.name} album cover`}
-                          width={192}
-                          height={192}
-                          className="rounded-lg"
-                        />
+                  {member.topTracks && member.topTracks.length > 0 ? (
+                    member.topTracks.map((track) => (
+                      <div key={track.id} className="flex-shrink-0 w-48">
+                        <div className="relative">
+                          <Image
+                            src={track.album.images[0]?.url || '/placeholder-album.png'}
+                            alt={`${track.name} album cover`}
+                            width={192}
+                            height={192}
+                            className="rounded-lg"
+                          />
+                        </div>
+                        <div className="mt-2">
+                          <p className="font-medium truncate">{track.name}</p>
+                          <p className="text-sm text-gray-300 truncate">{track.artists[0]?.name}</p>
+                        </div>
                       </div>
-                      <div className="mt-2">
-                        <p className="font-medium truncate">{track.name}</p>
-                        <p className="text-sm text-gray-300 truncate">{track.artist}</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="text-gray-400 text-sm">No tracks available</div>
+                  )}
                 </div>
               </div>
             ))}
@@ -223,29 +355,88 @@ export default function GroupPage() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">Song of the Day</h2>
-            <button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
-              Submit Song
+            <button 
+              onClick={() => setShowSongSearch(!showSongSearch)}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              {showSongSearch ? 'Cancel' : 'Submit Song'}
             </button>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {songsOfTheDay.map((song) => (
-              <div key={song.id} className="flex-shrink-0 w-48">
-                <div className="relative">
-                  <Image
-                    src={song.track.albumCover}
-                    alt={`${song.track.name} album cover`}
-                    width={192}
-                    height={192}
-                    className="rounded-lg"
-                  />
-                </div>
-                <div className="mt-2">
-                  <p className="font-medium truncate">{song.track.name}</p>
-                  <p className="text-sm text-gray-300 truncate">{song.track.artist}</p>
-                  <p className="text-xs text-[#1DB954] mt-1">by {song.submittedBy}</p>
-                </div>
+
+          {/* Song Search Modal */}
+          {showSongSearch && (
+            <div className="mb-6 p-6 bg-gray-900 rounded-lg border border-gray-800">
+              <h3 className="text-lg font-semibold mb-4">Search and Submit a Song</h3>
+              <div className="flex gap-4 mb-4">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && searchSongs(searchQuery)}
+                  className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#1DB954] focus:border-transparent"
+                  placeholder="Search for a song..."
+                />
+                <button
+                  onClick={() => searchSongs(searchQuery)}
+                  disabled={searching || !searchQuery.trim()}
+                  className="px-6 py-2 bg-[#1DB954] hover:bg-[#1ed760] disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors"
+                >
+                  {searching ? 'Searching...' : 'Search'}
+                </button>
               </div>
-            ))}
+
+              {/* Search Results */}
+              {searchResults.length > 0 && (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {searchResults.map((track) => (
+                    <div
+                      key={track.id}
+                      className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 cursor-pointer"
+                      onClick={() => submitSongOfTheDay(track)}
+                    >
+                      <Image
+                        src={track.album.images[0]?.url || '/placeholder-album.png'}
+                        alt={`${track.name} album cover`}
+                        width={40}
+                        height={40}
+                        className="rounded"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{track.name}</p>
+                        <p className="text-sm text-gray-400 truncate">{track.artists[0]?.name}</p>
+                      </div>
+                      <div className="text-[#1DB954]">+</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Songs of the Day Display */}
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {songsOfTheDay.length > 0 ? (
+              songsOfTheDay.map((song) => (
+                <div key={song.id} className="flex-shrink-0 w-48">
+                  <div className="relative">
+                    <Image
+                      src={song.track.albumCover || '/placeholder-album.png'}
+                      alt={`${song.track.name} album cover`}
+                      width={192}
+                      height={192}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <p className="font-medium truncate">{song.track.name}</p>
+                    <p className="text-sm text-gray-300 truncate">{song.track.artist}</p>
+                    <p className="text-xs text-[#1DB954] mt-1">by {song.submittedBy}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-gray-400 text-sm">No songs submitted yet</div>
+            )}
           </div>
         </section>
 
@@ -253,29 +444,33 @@ export default function GroupPage() {
         <section>
           <h2 className="text-2xl font-bold mb-6">Recently Released</h2>
           <div className="flex gap-4 overflow-x-auto pb-4">
-            {recentReleases.map((release) => (
-              <div key={release.id} className="flex-shrink-0 w-48">
-                <div className="relative">
-                  <Image
-                    src={release.albumCover}
-                    alt={`${release.name} album cover`}
-                    width={192}
-                    height={192}
-                    className="rounded-lg"
-                  />
-                  <div className="absolute top-2 right-2 bg-black bg-opacity-75 px-2 py-1 rounded text-xs">
-                    {release.type}
+            {recentReleases.length > 0 ? (
+              recentReleases.map((release) => (
+                <div key={release.id} className="flex-shrink-0 w-48">
+                  <div className="relative">
+                    <Image
+                      src={release.albumCover || '/placeholder-album.png'}
+                      alt={`${release.name} album cover`}
+                      width={192}
+                      height={192}
+                      className="rounded-lg"
+                    />
+                    <div className="absolute top-2 right-2 bg-black bg-opacity-75 px-2 py-1 rounded text-xs">
+                      {release.type}
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <p className="font-medium truncate">{release.name}</p>
+                    <p className="text-sm text-gray-300 truncate">{release.artist}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(release.releaseDate).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
-                <div className="mt-2">
-                  <p className="font-medium truncate">{release.name}</p>
-                  <p className="text-sm text-gray-300 truncate">{release.artist}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {new Date(release.releaseDate).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-gray-400 text-sm">Loading recent releases...</div>
+            )}
           </div>
         </section>
 
