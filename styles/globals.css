@@ -5,4 +5,5 @@
 
 html, body {
   font-family: 'Inter', sans-serif;
+  @apply bg-[#191414] text-white;
 }
