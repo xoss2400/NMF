@@ -1,9 +1,28 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+@import "tailwindcss";
 
 html, body {
+  background-color: #191414;
+  color: white;
+  min-height: 100vh;
   font-family: 'Inter', sans-serif;
-  @apply bg-[#191414] text-white;
+}
+
+/* Global link styles */
+a {
+  color: #1DB954;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #1ed760;
+}
+
+/* Global button styles */
+button {
+  transition: all 0.2s;
+}
+
+/* Ensure all text is readable */
+* {
+  color: inherit;
 }
