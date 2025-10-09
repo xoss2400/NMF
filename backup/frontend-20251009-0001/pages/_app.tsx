@@ -1,7 +1,6 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
-import Layout from '../components/Layout';
 
 export default function MyApp({
   Component,
@@ -9,9 +8,9 @@ export default function MyApp({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Layout>
+      <div className="min-h-screen bg-[#191414] text-white font-sans">
         <Component {...pageProps} />
-      </Layout>
+      </div>
     </SessionProvider>
   );
 }

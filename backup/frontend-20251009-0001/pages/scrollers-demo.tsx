@@ -1,12 +1,13 @@
 "use client"
 import React from 'react'
-import HorizontalScroller from '../components/shared/HorizontalScroller'
-import TrackCard from '../components/cards/TrackCard'
-import ArtistCard from '../components/cards/ArtistCard'
-import GenreChip from '../components/cards/GenreChip'
-import SongOfDayCard from '../components/cards/SongOfDayCard'
-import ReleaseCard from '../components/cards/ReleaseCard'
-import UpcomingReleaseCard from '../components/cards/UpcomingReleaseCard'
+import HorizontalScroller, {
+  TrackCard,
+  ArtistCard,
+  GenreChip,
+  SongOfDayCard,
+  ReleaseCard,
+  UpcomingReleaseCard,
+} from '../components/HorizontalScroller'
 import Link from 'next/link'
 
 const mockTracks = Array.from({ length: 8 }).map((_, i) => ({

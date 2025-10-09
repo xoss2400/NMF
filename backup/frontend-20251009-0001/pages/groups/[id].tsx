@@ -3,13 +3,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import HorizontalScroller from "../../components/shared/HorizontalScroller";
-import TrackCard from "../../components/cards/TrackCard";
-import ArtistCard from "../../components/cards/ArtistCard";
-import GenreChip from "../../components/cards/GenreChip";
-import SongOfDayCard from "../../components/cards/SongOfDayCard";
-import ReleaseCard from "../../components/cards/ReleaseCard";
-import UpcomingReleaseCard from "../../components/cards/UpcomingReleaseCard";
+import HorizontalScroller, { 
+  TrackCard, 
+  ArtistCard, 
+  GenreChip, 
+  SongOfDayCard, 
+  ReleaseCard, 
+  UpcomingReleaseCard 
+} from "../../components/HorizontalScroller";
 
 interface GroupMember {
   id: string;
