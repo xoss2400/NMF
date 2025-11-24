@@ -1,45 +1,54 @@
-'use client'
+import Head from "next/head";
+import Link from "next/link";
+import { signIn, signOut, useSession } from "next-auth/react";
 
-import Image from "next/image";
-import { signIn } from "next-auth/react";
+export default function Home() {
+  const { data: session, status } = useSession();
 
-export default function LandingPage() {
+  const isLoading = status === "loading";
+
   return (
-    <div className="relative flex items-center justify-center min-h-[calc(100vh-4rem)] bg-[#191414] text-white font-sans text-center">
+    <>
+      <Head>
+        <title>Spotify Connect Starter</title>
+      </Head>
+      <main className="flex flex-col items-center justify-center min-h-screen gap-6 px-6 bg-gradient-to-br from-[#0f172a] via-[#0b1021] to-[#0a0f1e]">
+        <div className="text-center space-y-2">
+          <p className="text-sm text-slate-400">Learning demo</p>
+          <h1 className="text-4xl font-bold text-white">Connect with Spotify</h1>
+          <p className="text-slate-300 max-w-xl">
+            Click the button below to sign in with your Spotify account. After authorization,
+            we will show your profile name and your current top artist.
+          </p>
+        </div>
 
-      {/* Neon Title */}
-      <h1 className="absolute top-12 text-6xl font-extrabold text-yellow-300 tracking-tight 
-        animate-pulse drop-shadow-[0_0_10px_#facc15]">
-        New Music Friday
-      </h1>
+        <div className="flex gap-3">
+          <button
+            disabled={isLoading}
+            onClick={() => signIn("spotify", { callbackUrl: "/profile" })}
+            className="rounded-full bg-[#1DB954] px-6 py-3 font-semibold text-black shadow-lg transition hover:scale-105 disabled:opacity-60"
+          >
+            {session ? "Re-connect Spotify" : "Sign in with Spotify"}
+          </button>
+          {session && (
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="rounded-full border border-slate-500 px-5 py-3 text-slate-200 transition hover:bg-slate-800/40"
+            >
+              Sign out
+            </button>
+          )}
+        </div>
 
-      {/* Buttons Row */}
-      <div className="absolute inset-x-0 bottom-[33%] flex justify-center gap-36">
-
-        {/* Spotify Login */}
-        <button
-          onClick={() => signIn("spotify", { callbackUrl: "/dashboard" })}
-          className="p-6 rounded-full bg-[#1DB954] hover:scale-105 transition-all shadow-lg"
-        >
-          <Image
-            src="https://developer-assets.spotifycdn.com/images/guidelines/design/full-logo-framed.svg"
-            alt="Spotify Logo"
-            width={90}
-            height={40}
-          />
-        </button>
-
-        {/* Apple Music (placeholder) */}
-        <button className="px-8 py-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-all shadow">
-          Apple Music
-        </button>
-
-        {/* Learn More (placeholder) */}
-        <button className="px-8 py-4 rounded-full bg-white text-black hover:bg-gray-200 transition-all shadow">
-          Learn More
-        </button>
-        
-      </div>
-    </div>
+        {session && (
+          <div className="text-slate-200 text-center space-y-2">
+            <p>Signed in as <span className="font-semibold">{session.user?.email ?? session.user?.name}</span></p>
+            <Link href="/profile" className="text-[#1DB954] underline underline-offset-4">
+              Go to your profile overview
+            </Link>
+          </div>
+        )}
+      </main>
+    </>
   );
 }
