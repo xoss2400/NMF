@@ -1,11 +1,11 @@
 // lib/auth.ts
-import type { NextAuthOptions } from "next-auth";
+import type { AuthOptions } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import { refreshAccessToken, type SpotifyToken } from "./spotify";
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma) as any, // small cast to quiet TS
   providers: [
     SpotifyProvider({
