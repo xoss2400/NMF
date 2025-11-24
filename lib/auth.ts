@@ -18,7 +18,6 @@ export const authOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    // Explicit : any to avoid implicit-any error
     async jwt({ token, account, user }: any) {
       // Initial sign-in
       if (account && user) {

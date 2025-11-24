@@ -1,61 +1,77 @@
 "use client";
 // app/page.tsx
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { AuthButton } from "@/Components/AuthButton";
+import { RefreshTasteButton } from "@/Components/RefreshTasteButton";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session: any = await getServerSession(authOptions as any);
+
+  let latestProfile: any = null;
+
+  if (session?.user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email as string },
+      include: {
+        tasteProfiles: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
+
+    if (user && user.tasteProfiles.length > 0) {
+      latestProfile = JSON.parse(user.tasteProfiles[0].dataJson);
+    }
+  }
+
   return (
-    <main className="page">
-      <section className="hero">
-        <p className="eyebrow">New Music Friday · Spotify OAuth demo</p>
-        <h1>Connect to Spotify and view your top artist</h1>
-        <p className="lede">
-          Click the button below to sign in with Spotify. After authorizing, we’ll fetch your
-          current top artist and show it here.
-        </p>
-      </section>
-
+    <main style={{ padding: "2rem", maxWidth: 800, margin: "0 auto" }}>
+      <h1>NMF App</h1>
       <AuthButton />
 
-      <style jsx>{`
-        .page {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 2rem;
-          padding: 2rem;
-          background: radial-gradient(circle at 20% 20%, #1e293b 0, transparent 30%),
-            radial-gradient(circle at 80% 30%, #0ea5e9 0, transparent 25%),
-            linear-gradient(135deg, #0b1021, #0f172a 45%, #0b1021);
-        }
-        .hero {
-          max-width: 640px;
-          text-align: center;
-          color: #e2e8f0;
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-        h1 {
-          font-size: clamp(2rem, 3vw, 2.75rem);
-          font-weight: 800;
-          letter-spacing: -0.02em;
-          color: #f8fafc;
-        }
-        .eyebrow {
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          font-size: 0.8rem;
-          color: #22d3ee;
-          font-weight: 700;
-        }
-        .lede {
-          color: #cbd5e1;
-          font-size: 1.05rem;
-          line-height: 1.6;
-        }
-      `}</style>
+      {!session && (
+        <p style={{ marginTop: "1rem" }}>
+          Sign in with Spotify to generate your taste profile.
+        </p>
+      )}
+
+      {session && (
+        <>
+          <RefreshTasteButton />
+
+          {latestProfile ? (
+            <section style={{ marginTop: "2rem" }}>
+              <h2>Your latest taste profile</h2>
+              <p>Fetched at: {latestProfile.fetchedAt}</p>
+
+              <h3 style={{ marginTop: "1rem" }}>Top Tracks</h3>
+              <ol>
+                {latestProfile.topTracks.items.map((track: any) => (
+                  <li key={track.id}>
+                    {track.name} –{" "}
+                    {track.artists.map((a: any) => a.name).join(", ")}
+                  </li>
+                ))}
+              </ol>
+
+              <h3 style={{ marginTop: "1rem" }}>Top Artists</h3>
+              <ol>
+                {latestProfile.topArtists.items.map((artist: any) => (
+                  <li key={artist.id}>{artist.name}</li>
+                ))}
+              </ol>
+            </section>
+          ) : (
+            <p style={{ marginTop: "1.5rem" }}>
+              No taste profile yet. Click &ldquo;Refresh taste profile&rdquo; to
+              fetch your data from Spotify.
+            </p>
+          )}
+        </>
+      )}
     </main>
   );
 }

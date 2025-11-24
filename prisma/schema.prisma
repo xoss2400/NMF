@@ -23,7 +23,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  tasteProfiles TasteProfile[] // your custom relation
+  tasteProfiles TasteProfile[]
 }
 
 model Account {
@@ -54,13 +54,12 @@ model Session {
   user User @relation(fields: [userId], references: [id])
 }
 
-// Your app data:
 model TasteProfile {
-  id           String   @id @default(cuid())
-  userId       String
-  createdAt    DateTime @default(now())
-  description  String? // e.g. summary text
-  dataJson     String   // serialized JSON of features / top tracks etc.
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  dataJson  String   // serialized JSON of top tracks/artists/etc.
 
   user User @relation(fields: [userId], references: [id])
 }
+
