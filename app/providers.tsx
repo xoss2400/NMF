@@ -1,9 +1,8 @@
-/* Providers to wrap the entire app */
+// app/providers.tsx
 "use client";
 
-import type { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return <SessionProvider>{children}</SessionProvider>;
 }
