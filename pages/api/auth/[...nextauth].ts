@@ -32,6 +32,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  // JWT strategy keeps sessions isolated per browser/user without a database.
+  session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, account, user }) {
       if (account && user) {
