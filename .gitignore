@@ -1,22 +1,47 @@
-# dependencies
-node_modules
+# OS junk
+.DS_Store
+Thumbs.db
 
-# next.js
-.next
-out
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
-# env
+# Node modules
+node_modules/
+
+# Next.js build output
+.next/
+out/
+.vercel/
+
+# TypeScript build output (if any)
+dist/
+
+# Env files (keep secrets out of git)
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# misc
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-dist
-.DS_Store
+# Instead, create and commit a template like:
+# .env.example
 
-.next
+# Prisma - local dev databases
+prisma/dev.db
+prisma/test.db
+prisma/*.db-journal
+
+# Prisma generated client (you regenerate this on build)
+lib/generated/
+
+# Coverage / testing
+coverage/
+.nyc_output/
+
+# Editor configs (optional, if you don’t want them)
+.vscode/
+.idea/
