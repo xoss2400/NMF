@@ -1,6 +1,6 @@
 "use client";
 // app/page.tsx
-import { AuthButton } from "@/components/AuthButton";
+import { AuthButton } from "@/Components/AuthButton";
 
 export default function HomePage() {
   return (
