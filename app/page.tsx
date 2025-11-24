@@ -1,4 +1,3 @@
-"use client";
 // app/page.tsx
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
