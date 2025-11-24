@@ -1,12 +1,11 @@
 // lib/auth.ts
-import type { AuthOptions } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import { refreshAccessToken, type SpotifyToken } from "./spotify";
 
-export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma) as any, // small cast to quiet TS
+export const authOptions = {
+  adapter: PrismaAdapter(prisma) as any,
   providers: [
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID!,
@@ -16,38 +15,51 @@ export const authOptions: AuthOptions = {
     }),
   ],
   session: {
-    // we'll use JWT-based sessions; adapter still handles User/Account in DB
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, account, user }) {
-      // Runs on sign-in and subsequent JWT refreshes
+    // Explicit : any to avoid implicit-any error
+    async jwt({ token, account, user }: any) {
+      // Initial sign-in
       if (account && user) {
         const expiresInMs = Number(account.expires_in ?? 0) * 1000;
-        token.user = user;
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token ?? token.refreshToken;
-        token.accessTokenExpires = account.expires_at
+
+        const anyToken = token as any;
+        anyToken.user = user;
+        anyToken.accessToken = account.access_token;
+        anyToken.refreshToken = account.refresh_token ?? anyToken.refreshToken;
+        anyToken.accessTokenExpires = account.expires_at
           ? account.expires_at * 1000
           : Date.now() + expiresInMs;
-        return token;
+
+        return anyToken;
       }
 
-      if (token.accessTokenExpires && Date.now() < token.accessTokenExpires) {
-        return token;
+      const anyToken = token as any;
+
+      // If still valid, reuse
+      if (
+        typeof anyToken.accessTokenExpires === "number" &&
+        Date.now() < anyToken.accessTokenExpires
+      ) {
+        return anyToken;
       }
 
-      return refreshAccessToken(token as SpotifyToken);
+      // Otherwise refresh
+      return refreshAccessToken(anyToken as SpotifyToken);
     },
-    async session({ session, token }) {
-      // Expose useful fields to the client and server
-      if (token && session.user) {
-        (session as any).accessToken = token.accessToken;
-        (session as any).refreshToken = token.refreshToken;
-        (session as any).accessTokenExpires = token.accessTokenExpires;
-        (session as any).error = token.error;
-        session.user = token.user as typeof session.user;
+
+    async session({ session, token }: any) {
+      const anyToken = token as any;
+
+      if (session.user) {
+        (session as any).accessToken = anyToken.accessToken;
+        (session as any).refreshToken = anyToken.refreshToken;
+        (session as any).accessTokenExpires = anyToken.accessTokenExpires;
+        (session as any).error = anyToken.error;
+        session.user = anyToken.user as typeof session.user;
       }
+
       return session;
     },
   },
